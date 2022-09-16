@@ -9,7 +9,7 @@ export default function Home() {
   
   const [activeTab, setActiveTab] = useState(0);
   const [searchText, setSearchText] = useState("");
-  const [user, setUser] = useState();
+  const user = auth.currentUser;
   
   const navSearch = (value) => {
     console.log(value);
@@ -17,7 +17,6 @@ export default function Home() {
   
   console.log(user);
   
-  //onAuthStateChanged(auth, (user) => setUser(user));
   
   return (
     <div className="min-h-screen bg-blue-100">

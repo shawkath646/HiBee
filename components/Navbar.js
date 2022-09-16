@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { AiOutlineSearch, AiOutlineUser } from "react-icons/ai";
+import { AiOutlineSearch, AiOutlineUser, AiOutlineUserAdd } from "react-icons/ai";
 
 export default function Navbar({activeTab, searchText, setActiveTab, setSearchText, user, navSearch}) {
   
@@ -15,9 +15,14 @@ export default function Navbar({activeTab, searchText, setActiveTab, setSearchTe
           {user ? (
             <img src="" alt="" className="w-8 h-6 object-cover rounded-full" />
           ) : (
-            <Link href="/auth">
-              <AiOutlineUser size="lg" className="h-8 w-8" />
-            </Link>
+            <div className="flex space-x-2 items-center">
+              <Link href="/signin">
+                <AiOutlineUser size="lg" className="h-8 w-8" />
+              </Link>
+              <Link href="/signup">
+                <AiOutlineUserAdd size="lg" className="h-8 w-8 hidden lg:block" />
+              </Link>
+            </div>
           )}
         </div>
       </div>

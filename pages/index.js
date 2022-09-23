@@ -1,15 +1,15 @@
 import Head from 'next/head'
 import { useState } from 'react';
-import { onAuthStateChanged } from "firebase/auth";
 import { auth } from '../firebase';
-import Navbar from '../components/Navbar'
+import { useAuthState } from 'react-firebase-hooks/auth';
+import Navbar from '../components/Navbar';
 
 
 export default function Home() {
   
   const [activeTab, setActiveTab] = useState(0);
   const [searchText, setSearchText] = useState("");
-  const user = auth.currentUser;
+  const [user, loading, error] = useAuthState(auth);
   
   const navSearch = (value) => {
     console.log(value);
@@ -19,7 +19,7 @@ export default function Home() {
   
   
   return (
-    <div className="min-h-screen bg-blue-100">
+    <div className="min-h-screen">
       <Head>
         <title>HiBee - Home</title>
       </Head>

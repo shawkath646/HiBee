@@ -23,7 +23,6 @@ export default function SignIn() {
   }, [user])
   
   const onSubmit = data => {
-    console.log(data);
     signInWithEmailAndPassword(auth, data.Email, data.Password)
     .then(() => {
       router.back();
@@ -31,7 +30,6 @@ export default function SignIn() {
       verifyErr(err.code);
     });
   };
-  console.log("form error", errors);
   
   const router = useRouter();
   
@@ -63,7 +61,7 @@ export default function SignIn() {
       </Head>
       
       <main className="flex h-full items-center justify-center">
-        <form onSubmit={handleSubmit(onSubmit)} className=" w-[450px] lg:w-[700px] p-3 bg-white rounded-lg shadow-xl space-y-10">
+        <form onSubmit={handleSubmit(onSubmit)} className=" w-[450px] lg:w-[500px] p-3 bg-white rounded-lg shadow-xl space-y-10">
           <p className="text-4xl font-bold text-blue-700 text-center">HiBee<sub className="text-sm text-gray-700">AUTH</sub></p>
           <div className="space-y-4">
             <input type="email" placeholder="Email" {...register("Email", {required: true})} className="form-control block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none invalid:border-red-600" />
@@ -79,7 +77,7 @@ export default function SignIn() {
                 >Show Password</label>
               </div>
               <Link href="/signup">
-                <p className="text-blue-700 font-semibold">Create new account</p>
+                <p className="text-blue-700 font-semibold cursor-pointer">Create new account</p>
               </Link>
             </div>
             <p className="text-sm font-semibold text-red-600 w-full text-center">{errorText}</p>

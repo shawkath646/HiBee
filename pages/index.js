@@ -20,6 +20,10 @@ export default function Home() {
       </Head>
       
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} user={user} theme={theme} setTheme={setTheme} />
+
+      <main className="h-[200vh]">
+
+      </main>
       
     </div>
   )

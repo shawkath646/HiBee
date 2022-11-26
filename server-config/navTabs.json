@@ -1,32 +1,32 @@
 [
     {
-        "id": 1,
+        "id": 0,
         "name": "Feed",
         "iconName": "",
         "enabled": true
     },
     {
-        "id": 2,
+        "id": 1,
         "name": "Posts",
         "iconName": "",
         "enabled": true
     },
     {
-        "id": 3,
+        "id": 2,
         "name": "News",
         "iconName": "",
         "enabled": true
     },
     {
-        "id": 4,
+        "id": 3,
         "name": "Stories",
         "iconName": "",
         "enabled": true
     },
     {
-        "id": 5,
+        "id": 4,
         "name": "Clips",
         "iconName": "",
-        "enabled": true
+        "enabled": false
     }
 ]

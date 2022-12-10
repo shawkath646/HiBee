@@ -1,0 +1,12 @@
+{
+    "hideNavbar": [
+      "/signup",
+      "/signin"
+    ],
+    
+    "hideFooter": [
+      "/signup",
+      "/signin",
+      "/clips"
+    ]
+  }

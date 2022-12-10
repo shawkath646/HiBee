@@ -3,30 +3,35 @@
         "id": 0,
         "name": "Feed",
         "iconName": "",
+        "path": "/",
         "enabled": true
     },
     {
         "id": 1,
         "name": "Posts",
-        "iconName": "",
+        "iconName": "BsFileEarmarkPostFill",
+        "path": "/posts",
         "enabled": true
     },
     {
         "id": 2,
         "name": "News",
-        "iconName": "",
+        "iconName": "FaRegNewspaper",
+        "path": "/news",
         "enabled": true
     },
     {
         "id": 3,
         "name": "Stories",
-        "iconName": "",
+        "iconName": "RiBookLine",
+        "path": "/stories",
         "enabled": true
     },
     {
         "id": 4,
         "name": "Clips",
-        "iconName": "",
+        "iconName": "RiMovieLine",
+        "path": "/clips",
         "enabled": false
     }
 ]

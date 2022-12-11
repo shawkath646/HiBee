@@ -71,7 +71,7 @@ export default function IntroductionComponent() {
                             leaveTo="transform opacity-0 translate-x-20"
                             className="grid gap-1 grid-cols-2 text-center mt-5"
                         >
-                            {/* <FeaturesItems /> */}
+                            <p>Hlw guess</p>
                         </Transition.Child>
                     </div>
                 </div>

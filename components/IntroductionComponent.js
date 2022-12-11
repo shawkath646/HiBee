@@ -78,7 +78,7 @@ export default function IntroductionComponent() {
                 <div className="flex items-center justify-center">
                     <div className="space-y-5">
                         <p className="text-5xl">Join us today !</p>
-                        <p>It's totally free.</p>
+                        <p>It<span>&#39;</span>s totally free.</p>
                         <div className="space-x-2 flex">
                             <input type="email" placeholder="Email" ref={emailRef} className="py-1 px-2 outline-none bg-white rounded-sm text-pink-600 font-medium" />
                             <Link href={"/signup"} className="px-2 rounded bg-emerald-500 font-medium leading-8">

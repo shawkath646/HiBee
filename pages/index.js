@@ -29,7 +29,7 @@ export default function Home() {
         </section>
 
         <section className="hidden lg:block lg:col-span-1">
-        <Suspense fallback={`Loading...`}>
+        <Suspense fallback={<div className="bg-blue-500">lol</div>}>
           <DynamicSidebar />
         </Suspense>
         </section>

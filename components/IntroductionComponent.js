@@ -19,42 +19,47 @@ export default function IntroductionComponent() {
     useEffect(() => {
         setMounted(true);
     }, []);
+    
+    const icons = {
+      FaRegNewspaper: FaRegNewspaper,
+      BsFileEarmarkPostFill: BsFileEarmarkPostFill,
+      RiMovieLine: RiMovieLine,
+      RiBookLine: RiBookLine
+    }
 
-    // const FeaturesItems = () => {
-    //     const icons = {
-    //         FaRegNewspaper: FaRegNewspaper,
-    //         BsFileEarmarkPostFill: BsFileEarmarkPostFill,
-    //         RiMovieLine: RiMovieLine,
-    //         RiBookLine: RiBookLine
-    //     }
-
-    //     const L = navTabs.map((e, k) => {
-    //         const iconName = e.iconName;
-    //         const Icon = icons[iconName];
-    //         (
-    //             <Link key={k} href={e.path} className="rounded mx-auto hover:scale-90 transition-all bg-gradient-to-tr bg-opacity-25 h-16 w-full px-3 from-blue-500/50 via-sky-500/50 to-emerald-500/50 space-x-4 flex items-center">
-    //                 <Icon size="lg" className="h-8 w-8" />
-    //                 <p className="text-xl">{e.name}</p>
-    //             </Link>
-    //         )
-    //     });
-
-    //     return L;
-    // }
-
+    const FeaturesItems = ({e}) => {
+      if(!e.enabled) return null;
+      const Icon = icons[e.iconName];
+      return (
+        <Link href={e.path} className="rounded mx-auto hover:scale-90 transition-all bg-gradient-to-tr bg-opacity-25 h-16 w-full px-3 from-blue-500/50 via-sky-500/50 to-emerald-500/50 space-x-4 flex items-center">
+          {Icon ? <Icon size="lg" className="h-8 w-8" /> : <div className="h-8 w-8"></div>}
+          <p className="text-xl">{e.name}</p>
+        </Link>
+      );
+    };
 
     return (
-        <div>
-            <Transition show={isMounted} appear={true} as="div" className="componentBg min-h-[800px] grid lg:grid-cols-2 text-white">
+        <div className="relative -z-10">
+            <Transition
+              show={isMounted}
+              appear={true}
+              enter="transition-opacity ease-linear duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="transition-opacity ease-linear duration-300"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+              className="componentBg min-h-[800px] grid lg:grid-cols-2 text-white"
+            >
                 <div className="flex items-center justify-center">
                     <div className="text-center">
                         <Transition.Child
-                            enter="transition ease-out duration-[2s]"
-                            enterFrom="transform opacity-0 translate-y-20"
-                            enterTo="transform opacity-100 translate-y-0"
-                            leave="transition ease-in duration-[2s]"
-                            leaveFrom="transform opacity-100 translate-y-0"
-                            leaveTo="transform opacity-0 translate-y-20"
+                            enter="transition ease-in-out duration-[1s] transform"
+                            enterFrom="translate-y-full opacity-0"
+                            enterTo="translate-y-0 opacity-100"
+                            leave="transition ease-in-out duration-[1s] transform"
+                            leaveFrom="translate-y-0 opacity-100"
+                            leaveTo="translate-y-full opacity-0"
                             className="my-10 lg:my-0"
                         >
                             <p className="text-7xl leading-tight">Welcome to</p>
@@ -63,19 +68,27 @@ export default function IntroductionComponent() {
                             <p className="mt-10 text-left leading-tight text-base text-teal-300">Your all neccessery features in 1 app</p>
                         </Transition.Child>
                         <Transition.Child
-                            enter="transition ease-out duration-[2s] delay-[1s]"
-                            enterFrom="transform opacity-0 translate-x-20"
-                            enterTo="transform opacity-100 translate-x-0"
-                            leave="transition ease-in duration-[2s] delay-[1s]"
-                            leaveFrom="transform opacity-100 translate-x-0"
-                            leaveTo="transform opacity-0 translate-x-20"
-                            className="grid gap-1 grid-cols-2 text-center mt-5"
+                          enter="transition ease-in-out duration-[1s] transform delay-[0.5s]"
+                          enterFrom="-translate-x-full opacity-0"
+                          enterTo="translate-x-0 opacity-100"
+                          leave="transition ease-in-out duration-[1s] transform delay-[0.5s]"
+                          leaveFrom="translate-x-0 opacity-100"
+                          leaveTo="-translate-x-full opacity-0"
+                          className="grid gap-1 grid-cols-2 text-center mt-5"
                         >
-                            <p>Hlw guess</p>
+                            {navTabs.map((e, key) => <FeaturesItems key={key} e={e} />)}
                         </Transition.Child>
                     </div>
                 </div>
-                <div className="flex items-center justify-center">
+                <Transition.Child
+                  enter="transition-opacity ease-linear duration-[1s] delay-[1s]"
+                  enterFrom="opacity-0"
+                  enterTo="opacity-100"
+                  leave="transition-opacity ease-linear duration-[1s] delay-[1s]"
+                  leaveFrom="opacity-100"
+                  leaveTo="opacity-0"
+                  className="flex items-center justify-center"
+                >
                     <div className="space-y-5">
                         <p className="text-5xl">Join us today !</p>
                         <p>It<span>&#39;</span>s totally free.</p>
@@ -86,7 +99,7 @@ export default function IntroductionComponent() {
                             </Link>
                         </div>
                     </div>
-                </div>
+                </Transition.Child>
             </Transition>
             <style jsx global>{`
                 .componentBg {

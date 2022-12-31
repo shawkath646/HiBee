@@ -5,7 +5,7 @@ import { getCsrfToken, useSession, signIn } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 import { AiOutlineGoogle } from 'react-icons/ai';
 import { FaFacebook } from 'react-icons/fa';
-import ToggleButton from '../../../components/toogleButton';
+import ToggleButton from '../../../components/ToogleButton';
 
 
 

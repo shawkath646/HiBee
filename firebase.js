@@ -1,6 +1,6 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore/lite';
-import { getAuth, GoogleAuthProvider, FacebookAuthProvider } from "firebase/auth";
+import { getApp, getApps, initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
+
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -13,12 +13,8 @@ const firebaseConfig = {
   measurementId: "G-FNGGND151R"
 };
 
-const app = initializeApp(firebaseConfig);
+const app = !getApps().length > 0 ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
-const auth = getAuth(app);
-
-const providerGoogle = new GoogleAuthProvider();
-const providerFacebook = new FacebookAuthProvider();
 
 
-export { app, auth, db, providerGoogle, providerFacebook };
+export { app, db };

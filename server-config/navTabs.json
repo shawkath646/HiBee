@@ -2,14 +2,14 @@
     {
         "id": 0,
         "name": "Feed",
-        "iconName": "",
+        "iconName": "FaLayerGroup",
         "path": "/",
         "enabled": true
     },
     {
         "id": 1,
         "name": "Posts",
-        "iconName": "BsFileEarmarkPostFill",
+        "iconName": "AiOutlinePicLeft",
         "path": "/posts",
         "enabled": true
     },

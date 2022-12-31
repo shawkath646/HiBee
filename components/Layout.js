@@ -19,7 +19,7 @@ export default function Layout ({ children }) {
     return (
         <>
             {!isPathInclude(hideComponent.hideNavbar) && <Navbar />}
-                <main className={!isPathInclude(hideComponent.hideNavbar) ? "pt-[50px]" : ""}>{children}</main>
+                <main className={`bg-gray-200 dark:bg-gray-800 ${!isPathInclude(hideComponent.hideNavbar) ? "pt-[50px]" : ""}`}>{children}</main>
             {!isPathInclude(hideComponent.hideFooter) && <Footer />}
         </>
     );

@@ -3,19 +3,18 @@ import { useRouter } from 'next/router';
 import Image from 'next/image';
 import { useState, Fragment, useEffect } from 'react'
 import { Menu, Transition } from '@headlessui/react'
+import { useSession, signIn, signOut } from "next-auth/react"
 import { useTheme } from 'next-themes';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../firebase';
-import { signOut } from "firebase/auth";
-import navTabs from '../server-config/navTabs';
-import { lockScroll, unlockScroll } from '../utilities/tools';
-import { AiOutlineSearch, AiOutlineUser, AiOutlineUserAdd, AiOutlineQuestionCircle } from "react-icons/ai";
-import { BsHeadset } from "react-icons/bs";
-import { BiBrush } from "react-icons/bi";
+import { AiOutlineUser, AiOutlineSearch } from "react-icons/ai";
+import { BsFillGearFill, BsFillMoonFill, BsQuestionCircle } from "react-icons/bs";
 import { FaBars } from "react-icons/fa";
-import { IoSettingsSharp } from "react-icons/io5";
-import { CgProfile } from "react-icons/cg";
+import { HiOutlineUserCircle } from "react-icons/hi";
 import { ImExit } from "react-icons/im";
+import { TfiHeadphoneAlt } from "react-icons/tfi";
+import navTabs from '../server-config/navTabs';
+import useWindowSize from '../utilities/useWindowSize';
+import { lockScroll, unlockScroll } from '../utilities/tools';
+import featuresIcon from '../server-config/FeaturesIcon';
 
 
 
@@ -24,10 +23,12 @@ export default function Navbar() {
   	const [navTabShow, setNavTabShow] = useState(true);
 	const [searchPopUp, setSearchPopUp]= useState(false);
 	const [navSearchItem, setNavSearchItem] = useState([]);
-	const [user] = useAuthState(auth);
 	
 	const router = useRouter();
+	const windowSize = useWindowSize();
 	const { theme, setTheme } = useTheme();
+
+	const { data: userData} = useSession();
 
 	var lastPos = 0;
 
@@ -44,7 +45,19 @@ export default function Navbar() {
 		console.log(searchResults);
 	}
 
+	const NavTabsItem = ({e}) => {
+		const Icon = featuresIcon[e.iconName];
+		return (
+			<li>
+				<button type="button" disabled={!e.enabled} onClick={() => router.push(e.path)} className={`min-w-[60px] shrink-0 p-1 rounded transition-all font-medium leading-5 ring-0 outline-none text-white flex space-x-1 items-center justify-center hover:bg-gray-500 dark:hover:bg-emerald-400 hover:bg-opacity-25 disabled:text-gray-400 ${router.pathname == e.path ? "bg-gray-500 dark:bg-emerald-500 bg-opacity-50" : ""}`}>
+					{Icon && <Icon size="lg" className="h-5 w-5" />}
+					<p>{e.name}</p>
+				</button>
+			</li>
+		);
+	}
 
+	
 
 	useEffect(() => {
 		window.addEventListener("scroll", handleScroll);
@@ -53,17 +66,14 @@ export default function Navbar() {
 	
 	return (
 		<>
-			<nav className="w-full fixed top-0 left-0">
-				<div className="bg-white relative dark:bg-gray-800 flex items-center justify-between p-2 lg:px-10 z-50 shadow-xl">
+			<nav className="w-full fixed top-0 left-0 z-[9990]">
+				<div className="bg-white dark:bg-gray-800 flex items-center justify-between p-2 lg:px-10 shadow-xl">
 					<Link href="/">
 						<p className="text-2xl font-bold text-emerald-500 cursor-pointer">HiBee</p>
 					</Link>
-					<div className="flex items-center space-x-2 lg:space-x-4">
-						<button type="button" onClick={() => {setSearchPopUp(true); lockScroll();}} className="lg:hidden text-emerald-500">
-							<AiOutlineSearch size="lg" className="h-8 w-8" />
-						</button>
-						<Menu as="div" className="hidden lg:block relative">
-							<AiOutlineSearch size="lg" className="absolute left-0 h-7 w-7 text-emerald-500" />
+					<div className="flex items-center space-x-3 lg:space-x-4">
+						{windowSize.width >= 768 && <Menu as="div" className="relative">
+							<AiOutlineSearch size="lg" className="absolute left-0 h-5 w-5 text-emerald-500" />
 							<input type="text" placeholder="Search..." onChange={(e) => navSearch(e)} className="pl-8 pb-1 bg-transparent border-b-2 border-emerald-500 focus:ring-0 outline-none" />
 							<Transition
 								show={navSearchItem.length > 0}
@@ -84,24 +94,21 @@ export default function Navbar() {
 									))}
 								</Menu.Items>
 							</Transition>
-						</Menu>
-						{user ? (
-							<Image src={user.photoURL} alt="profile_img" height="38" width="38" className="rounded-full" />
+						</Menu>}
+						{userData ? (
+							<Image src={userData.user.image} alt="profile_img" height="40" width="40" className="rounded-full border-2 p-0.5 scale-105 border-gray-300 dark:border-gray-900" />
 
 						) : (
-							<div className="flex items-center space-x-3">
-								<Link href="/signin" className="flex items-center font-medium text-emerald-500 hover:text-emerald-600 cursor-pointer">
-									<AiOutlineUser size="lg" className="w-8 h-8 lg:w-6 lg:h-6" />
-									<p className="text-sm hidden lg:block">SignIn</p>
-								</Link>
-								<Link href="/signup" className="flex items-center font-medium text-emerald-500 hover:text-emerald-600 cursor-pointer">
-									<AiOutlineUserAdd size="lg" className="w-8 h-8 lg:w-6 lg:h-6" />
-									<p className="text-sm hidden lg:block">SignUp</p>
-								</Link>
-							</div>
+							<button onClick={() => signIn()} className="flex items-center font-medium text-emerald-500 hover:text-emerald-600 cursor-pointer">
+								<AiOutlineUser size="lg" className="w-8 h-8 lg:w-6 lg:h-6" />
+								<p className="text-sm hidden lg:block">SignIn / SignUp</p>
+							</button>
 						)}
+						{windowSize.width < 768 && <button type="button" onClick={() => {setSearchPopUp(true); lockScroll();}} className="text-emerald-500">
+							<AiOutlineSearch size="lg" className="h-8 w-8" />
+						</button>}
 						<Menu as="div" className="relative inline-block text-left">
-							<Menu.Button type="button" className="text-emerald-500 hover:text-emerald-600 transition-all">
+							<Menu.Button type="button" className="text-emerald-500 hover:text-emerald-600 transition-all outline-none ring-0">
 								<FaBars size="lg" className="h-8 w-8" />
 							</Menu.Button>
 							<Transition
@@ -116,36 +123,36 @@ export default function Navbar() {
 								<Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y  divide-gray-100 rounded-md bg-white dark:divide-black dark:text-gray-200 dark:bg-gray-900 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none font-medium">
 									<Menu.Item>
 										<Link href="/profile" className="group flex space-x-2 w-full items-center cursor-pointer rounded-md px-2 py-2 hover:bg-gray-200 dark:hover:bg-emerald-600 transition-all">
-											<CgProfile size="lg" className="h-4 w-4" />
+											<HiOutlineUserCircle size="lg" className="h-4 w-4" />
 											<p>Profile</p>
 										</Link>
 									</Menu.Item>
 									<Menu.Item>
 										<button type="button" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="group flex space-x-2 w-full items-center rounded-md px-2 py-2 hover:bg-gray-200 dark:hover:bg-emerald-700 transition-all">
-											<BiBrush size="lg" className="h-4 w-4" />
+											<BsFillMoonFill size="lg" className="h-4 w-4" />
 											<p>Dark Mode</p>
 										</button>
 									</Menu.Item>
 									<Menu.Item>
 										<Link href="/settings" className="group flex space-x-2 w-full items-center rounded-md px-2 py-2 hover:bg-gray-200 dark:hover:bg-emerald-700 transition-all">
-											<IoSettingsSharp size="lg" className="h-4 w-4" />
+											<BsFillGearFill size="lg" className="h-4 w-4" />
 											<p>Settings</p>
 										</Link>
 									</Menu.Item>
 									<Menu.Item>
 										<Link href="/helps" className="group flex space-x-2 w-full items-center rounded-md px-2 py-2 hover:bg-gray-200 dark:hover:bg-emerald-700 transition-all">
-											<AiOutlineQuestionCircle size="lg" className="h-4 w-4" />
+											<BsQuestionCircle size="lg" className="h-4 w-4" />
 											<p>Helps</p>
 										</Link>
 									</Menu.Item>
 									<Menu.Item>
 										<Link href="/live-support" className="group flex space-x-2 w-full items-center rounded-md px-2 py-2 hover:bg-gray-200 dark:hover:bg-emerald-700 transition-all">
-											<BsHeadset size="lg" className="h-4 w-4" />
+											<TfiHeadphoneAlt size="lg" className="h-4 w-4" />
 											<p>Live Support</p>
 										</Link>
 									</Menu.Item>
 									<Menu.Item>
-										<button type="button" onClick={() => signOut(auth)} className="group flex space-x-2 w-full items-center rounded-md px-2 py-2 hover:bg-gray-200 dark:hover:bg-emerald-600 transition-all">
+										<button type="button" onClick={() => {signOut()}} className="group flex space-x-2 w-full items-center rounded-md px-2 py-2 hover:bg-gray-200 dark:hover:bg-emerald-600 transition-all">
 											<ImExit size="lg" className="h-4 w-4" />
 											<p>Sign Out</p>
 										</button>
@@ -157,22 +164,16 @@ export default function Navbar() {
 				</div>
 				<Transition
 					show={navTabShow}
+					as="ul"
 					enter="transition ease duration-100 transform"
 					enterFrom="-translate-y-12"
 					enterTo="opacity-100 translate-y-0"
 					leave="transition ease duration-100 transform"
 					leaveFrom="translate-y-0"
 					leaveTo="-translate-y-12"
+					className="flex items-center overflow-auto bg-emerald-900/50 backdrop-blur p-2 lg:px-10 space-x-5 relative -z-[1]"
 				>
-					<ul className="flex items-center overflow-auto bg-emerald-900/50 backdrop-blur p-2 lg:px-10 space-x-5 z-40">
-						{navTabs.map((e) => (
-							<li key={e.id}>
-								<button type="button" disabled={!e.enabled} onClick={() => router.push(e.path)} className={`min-w-[60px] shrink-0 py-1 rounded transition-all font-medium leading-5 text-white  hover:bg-gray-500 dark:hover:bg-emerald-400 hover:bg-opacity-25 disabled:text-gray-400 ${router.pathname == e.path ? "bg-gray-500 dark:bg-emerald-500 bg-opacity-50" : ""}`}>
-									<p>{e.name}</p>
-								</button>
-							</li>
-						))}
-					</ul>
+					{navTabs.map((e, k) => <NavTabsItem e={e} key={k} />)}
 				</Transition>
 			</nav>
 			<Transition

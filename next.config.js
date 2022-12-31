@@ -3,13 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'lh3.googleusercontent.com',
-        pathname: '/**',
-      },
-    ],
+    domains: ['lh3.googleusercontent.com', 'platform-lookaside.fbsbx.com'],
   },
 }
 module.exports = nextConfig

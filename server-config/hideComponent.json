@@ -8,5 +8,9 @@
       "/signup",
       "/signin",
       "/clips"
+    ],
+    "hideLeftSidebar": [
+      "/signup",
+      "/signin"
     ]
   }

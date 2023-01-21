@@ -1,26 +1,23 @@
 import Head from 'next/head'
 import dynamic from 'next/dynamic'
-import { useEffect, useState, Suspense } from 'react'
-import PostTemplate from '../components/PostTemplate';
+import { useState, Suspense } from 'react'
+import { useSession } from 'next-auth/react';
+import PostTemplate from '../components/ui/PostTemplate';
 import useWindowSize from '../utilities/useWindowSize';
-import { getSession } from 'next-auth/react';
-import IntroductionComponent from '../components/IntroductionComponent';
-import LoadingAnimation from '../components/LoadingAnimation';
+import LoadingAnimation from '../components/ui/LoadingAnimation';
 
-export default function Home({session}) {
+export default  function Home() {
 
-  const [newPostWindow, setNewPostWindow] = useState({
-    state: false,
-    type: "post",
-  });
+
+  const [newPostWindow, setNewPostWindow] = useState(false);
   const [latestData, setLatestData] = useState();
 
+  const { data: session } = useSession();
   const windowSize = useWindowSize();
 
-  console.log(newPostWindow);
-
-  const DynamicSidebar  = dynamic(() => import('../components/Sidebar'));
-  const DynamicNewPost = dynamic(() => import('../components/NewPost'));
+  const DynamicIntroductionComponent = dynamic(() => import('../components/home/IntroductionComponent'))
+  const DynamicSidebar  = dynamic(() => import('../components/home/Sidebar'));
+  const DynamicNewModal = dynamic(() => import('../components/modals/NewModal'));
 
   
   return (
@@ -29,9 +26,13 @@ export default function Home({session}) {
         <title>HiBee - Home</title>
       </Head>
       <Suspense fallback={<div>Loading...</div>}>
-        <DynamicNewPost isOpen={newPostWindow} setIsOpen={setNewPostWindow} />
+        <DynamicNewModal isOpen={newPostWindow} setIsOpen={setNewPostWindow} />
       </Suspense>
-      {true && <IntroductionComponent />}
+      {!session && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <DynamicIntroductionComponent />
+        </Suspense>
+      )}
       <div className="grid grid-cols-9 lg:gap-2 pt-12">
         <section className="col-span-9 lg:col-span-7 py-10 bg-white dark:bg-gray-900 h-[815px]">
           <div className="text-center mb-10">
@@ -52,7 +53,7 @@ export default function Home({session}) {
 
         {windowSize.width >= 1024 && <section className="col-span-2 pr-3">
           <Suspense fallback={<div>Loading...</div>}>
-            <DynamicSidebar setNewPostWindow={setNewPostWindow} />
+            <DynamicSidebar setNewPostWindow={setNewPostWindow} session={session} />
           </Suspense>
         </section>}
       </div>
@@ -61,12 +62,4 @@ export default function Home({session}) {
   )
 }
 
-export async function getServerSideProps({req}) {
-  const session = await getSession({req});
 
-  return {
-    props: {
-      session
-    },
-  }
-}

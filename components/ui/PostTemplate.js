@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { AiFillEye, AiFillHeart } from "react-icons/ai";
 import { BsBook, BsArrowRight } from "react-icons/bs";
-import noThumbnail from "./images/image-preview-icon-picture-placeholder-vector-31284806.webp";
+import noThumbnail from "../../public/assets/no-thumbnail.png";
 
 export default function PostTemplate({ data, user }) {
     return (

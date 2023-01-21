@@ -58,7 +58,7 @@ export default function SignIn() {
           <div className="absolute right-5 top-5">
             <ToggleButton label="Dark theme" onChange={() => setTheme(theme === "dark" ? "light" : "dark")} checked={theme === "dark"} />
           </div>
-          {windowSize.width >= 1080 && <Image src={authImage.src} width="400" height="400" />}
+          {windowSize.width >= 1080 && <Image alt="SignIn vector Image" src={authImage.src} width="400" height="400" />}
         <div className="w-full lg:w-80 mx-auto">
           <p className="text-6xl font-bold mb-7 text-center">H<span className="text-blue-500">i</span>Bee<small className="text-lg">auth</small></p>
           <form onSubmit={handleSubmit} className="space-y-5">

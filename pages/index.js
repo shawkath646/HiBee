@@ -1,24 +1,24 @@
 import Head from 'next/head'
 import dynamic from 'next/dynamic'
 import { useState, Suspense } from 'react'
-import { useSession } from 'next-auth/react';
+import { getSession } from 'next-auth/react';
+import IntroductionComponent from '../components/home/IntroductionComponent';
 import PostTemplate from '../components/ui/PostTemplate';
 import useWindowSize from '../utilities/useWindowSize';
 import LoadingAnimation from '../components/ui/LoadingAnimation';
 
-export default  function Home() {
+export default function Home({ user: session }) {
 
 
   const [newPostWindow, setNewPostWindow] = useState(false);
   const [latestData, setLatestData] = useState();
 
-  const { data: session } = useSession();
   const windowSize = useWindowSize();
 
-  const DynamicIntroductionComponent = dynamic(() => import('../components/home/IntroductionComponent'))
   const DynamicSidebar  = dynamic(() => import('../components/home/Sidebar'));
   const DynamicNewModal = dynamic(() => import('../components/modals/NewModal'));
 
+console.log(session)
   
   return (
     <>
@@ -28,11 +28,7 @@ export default  function Home() {
       <Suspense fallback={<div>Loading...</div>}>
         <DynamicNewModal isOpen={newPostWindow} setIsOpen={setNewPostWindow} />
       </Suspense>
-      {!session && (
-        <Suspense fallback={<div>Loading...</div>}>
-          <DynamicIntroductionComponent />
-        </Suspense>
-      )}
+      {!session && <IntroductionComponent />}
       <div className="grid grid-cols-9 lg:gap-2 pt-12">
         <section className="col-span-9 lg:col-span-7 py-10 bg-white dark:bg-gray-900 h-[815px]">
           <div className="text-center mb-10">
@@ -62,4 +58,18 @@ export default  function Home() {
   )
 }
 
-
+export async function getServerSideProps({ req }) {
+  const session = await getSession({ req });
+  var user;
+  if(typeof session?.user === "undefined") {
+    user = null;
+  } else {
+    user = session.user;
+  }
+ 
+  return {
+    props: {
+      user
+    }
+  }
+}

@@ -2,6 +2,8 @@ import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { getDoc, doc } from "firebase/firestore";
+import { db } from '../../../firebase';
 
 export const authOptions = {
     providers: [
@@ -15,8 +17,13 @@ export const authOptions = {
         }),
         CredentialsProvider({
             name: "Credentials",
-            async authorize(credentials, req) {
-                console.log(credentials);
+            async authorize(credentials, req, res) {
+              const userName = credentials.email.replace(/@.*$/,"");
+              const userSnap  = await getDoc(doc(db, 'users', userName));
+                if(userSnap.exists()) {
+                  return userSnap.data();
+                };
+              res.status(404).json({ error: "User not exists" });
             }
         })
     ],

@@ -5,7 +5,7 @@ import sideVectorImage from "../../public/assets/—Pngtree—floating people co
 
 export default function IntroductionComponent() {
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen bg-white dark:bg-gray-900 pt-[180px] lg:pt-0">
+        <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen bg-white dark:bg-gray-900 pt-[180px] pb-16 lg:pb-0 lg:pt-0">
             <section className="flex items-center justify-center">
                 <div className="text-center">
                     <p className="text-7xl mb-5">Welcome to</p>

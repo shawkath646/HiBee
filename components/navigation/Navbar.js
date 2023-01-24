@@ -5,11 +5,12 @@ import { useState, Fragment, useEffect } from 'react'
 import { signIn, signOut, useSession } from 'next-auth/react';
 import { Menu, Transition } from '@headlessui/react'
 import { useTheme } from 'next-themes';
+import SubNavbar from './SubNavbar'
 import useWindowSize from '../../utilities/useWindowSize';
 import { lockScroll, unlockScroll } from '../../utilities/tools';
 import ToggleButton from '../ui/ToggleButton';
-import navTabs from '../../server-config/navTabs';
-import featuresIcon from '../../server-config/FeaturesIcon';
+
+
 
 
 
@@ -22,13 +23,8 @@ import { TfiHeadphoneAlt } from "react-icons/tfi";
 
 
 
-
-
-
-
 export default function Navbar() {
 
-  	const [navTabShow, setNavTabShow] = useState(true);
 	const [searchPopUp, setSearchPopUp]= useState(false);
 	const [navSearchItem, setNavSearchItem] = useState({
 		searchText: "",
@@ -41,13 +37,7 @@ export default function Navbar() {
 
 	const { data: session } = useSession();
 
-	var lastPos = 0;
-
-	const handleScroll = () => {
-		let current_pos = window.scrollY;
-		current_pos > lastPos ? setNavTabShow(false) : setNavTabShow(true);
-		lastPos = current_pos;
-	}
+	
 
 	const navSearch = (e) => {
 		let searchText = e.target.value;
@@ -56,24 +46,10 @@ export default function Navbar() {
 		console.log(navSearchItem)
 	}
 
-	const NavTabsItemTop = ({e}) => {
-		const Icon = featuresIcon[e.iconName];
-		return (
-			<li>
-				<button type="button" disabled={!e.enabled} onClick={() => router.push(e.path)} className={`min-w-[60px] shrink-0 p-1 transition-all font-medium leading-5 ring-0 outline-none rounded-sm flex space-x-1 items-center justify-center disabled:text-gray-400 ${router.pathname == e.path ? " bg-blue-500 hover:bg-blue-700 text-white" : "hover:bg-blue-500 hover:bg-opacity-50 text-black dark:text-gray-200"}`}>
-					{Icon && <Icon size="lg" className="h-5 w-5" />}
-					<p>{e.name}</p>
-				</button>
-			</li>
-		);
-	}
-
+	
 	
 
-	useEffect(() => {
-		window.addEventListener("scroll", handleScroll);
-    	return () => window.removeEventListener("scroll", handleScroll);
-	}, []);
+	
 	
 	return (
 		<>
@@ -180,19 +156,7 @@ export default function Navbar() {
 						</Menu>
 					</div>
 				</div>
-				<Transition
-					show={navTabShow && windowSize.width < 1080}
-					as="ul"
-					enter="transition ease duration-100 transform"
-					enterFrom="-translate-y-12"
-					enterTo="opacity-100 translate-y-0"
-					leave="transition ease duration-100 transform"
-					leaveFrom="translate-y-0"
-					leaveTo="-translate-y-12"
-					className="flex items-center overflow-auto backdrop-blur p-2 lg:px-10 space-x-5 relative -z-[1]"
-				>
-					{navTabs.map((e, k) => <NavTabsItemTop e={e} key={k} />)}
-				</Transition>
+				{windowSize.width < 1080 && <SubNavbar />}
 			</nav>
 			<Transition
                 show={searchPopUp && windowSize.width < 768}

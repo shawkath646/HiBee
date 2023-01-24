@@ -3,7 +3,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { getSession, signIn } from 'next-auth/react';
+import { getSession, signIn, getCsrfToken } from 'next-auth/react';
+
 import { useTheme } from 'next-themes';
 import ToggleButton from '../../../components/ui/ToggleButton';
 import FormInput from '../../../components/form/FormInput';
@@ -13,13 +14,7 @@ import useWindowSize from '../../../utilities/useWindowSize';
 import authImage from '../../../public/assets/20944201.png';
 
 
-
-
-
-
-
-
-export default function SignIn() {
+export default function SignIn({ csrfToken }) {
 
   const [data, setData] = useState({
     email: "",
@@ -32,7 +27,7 @@ export default function SignIn() {
   const { theme, setTheme } = useTheme();
   const windowSize = useWindowSize();
 
-  const router = useRouter;
+  const router = useRouter();
 
 
   const handleSubmit = async(e) => {
@@ -43,7 +38,7 @@ export default function SignIn() {
       redirect: false,
       callbackUrl: "/"
     });
-
+    console.log(status);
     if (status.ok) router.push(status.url);
   }
   
@@ -62,8 +57,9 @@ export default function SignIn() {
         <div className="w-full lg:w-80 mx-auto">
           <p className="text-6xl font-bold mb-7 text-center">H<span className="text-blue-500">i</span>Bee<small className="text-lg">auth</small></p>
           <form onSubmit={handleSubmit} className="space-y-5">
-            <FormInput label="Email" type="email" name="email" value={data.email} setValue={(e) => setData({ ...data, email: e})} />
-            <FormInput label="Password" type={showPassword ? "text" : "password"} name="password" value={data.password} setValue={(e) => setData({ ...data, password: e})} />
+            <input name="csrfToken" type="hidden" defaultValue={csrfToken} className="space-y-5" />
+            <FormInput label="Email" type="email" name="email" value={data.email} setValue={(e) => setData({ ...data, email: e})} required />
+            <FormInput label="Password" type={showPassword ? "text" : "password"} name="password" value={data.password} setValue={(e) => setData({ ...data, password: e})} required />
             <div className="flex items-center justify-between">
               <Checkbox onChange={() => setShowPassword(!showPassword)} label="Show password" checked={showPassword} />
               <Link href="/auth/signup" className="text-blue-500 transition-all hover:text-blue-700">Create an account</Link>
@@ -77,8 +73,8 @@ export default function SignIn() {
   );
 }
 
-export async function getServerSideProps({ req }) {
-  const session = await getSession({ req });
+export async function getServerSideProps(context) {
+  const session = await getSession(context.req);
 
   if (session) {
     return {
@@ -90,6 +86,8 @@ export async function getServerSideProps({ req }) {
   }
 
   return {
-    props: {}
+    props: {
+      csrfToken: await getCsrfToken(context),
+    }
   };
 }

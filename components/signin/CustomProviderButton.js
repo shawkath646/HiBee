@@ -11,11 +11,11 @@ export default function CustomProviderButton() {
             </div>
             <button type="button" onClick={() => signIn('google')} className="flex items-center justify-center rounded-sm space-x-4 py-1 w-full border border-gray-200 dark:border-none hover:text-blue-500 transition-all dark:hover:text-gray-400">
               <p>Signin with google</p>
-              <Image src={logoGoogle.src} height="20" width="20" />
+              <Image src={logoGoogle.src} alt="" height="20" width="20" />
             </button>
             <button type="button" onClick={() => signIn('facebook')} className="flex items-center justify-center rounded-sm space-x-4 py-1 w-full border border-gray-200 dark:border-none hover:text-blue-500 transition-all dark:hover:text-gray-400">
               <p>Signin with facebook</p>
-              <Image src={logoFacebook.src} height="20" width="20" />
+              <Image src={logoFacebook.src} alt="" height="20" width="20" />
             </button>
         </div>
     );

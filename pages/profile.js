@@ -43,7 +43,7 @@ export default function Profile({ stringySession }) {
 
     useEffect(() => {
         if (!session.user.metaInfo?.wizardComplete) setDialog(1);
-    }, [])
+    }, [session]);
 
     const genders = [
         { name: 'Male' },
@@ -98,7 +98,7 @@ export default function Profile({ stringySession }) {
                         <label className="text-black dark:text-gray-200">Email :</label>
                         <input type="text" {...register("email", {required: {value: true, message: "Enter email"}, pattern: { value: /^\S+@\S+$/i, message: "Invalid email format"}})} className={`bg-transparent pb-2 border-b outline-0 w-full text-gray-600 dark:text-gray-200 ${errors.email ? "border-red-500" : "border-gray-200 dark:border-gray-800 focus:border-green-500"} transition-all autofill:bg-transparent`} readOnly />
                         <p className="text-sm text-red-500">{errors.email?.message}</p>
-                        <p className="text-sm text-blue-500">* Email can't be change</p>
+                        <p className="text-sm text-blue-500">* Email can&apos;t be change</p>
                     </div>
                     <div className="space-y-1">
                         <label className="text-black dark:text-gray-200">Phone Number :</label>

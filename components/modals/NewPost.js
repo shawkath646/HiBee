@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { BiWorld } from "react-icons/bi";
@@ -22,7 +23,7 @@ export default function NewPost() {
     return (
         <form onSubmit={handleSubmit} className="space-y-3">
             {!true ? (
-                <img src={''} alt="Post thumbnail" className="w-full h-[200px] rounded-sm" />
+                <Image src={''} alt="Post thumbnail" className="w-full h-[200px] rounded-sm" />
             ) : (
                 <div className="bg-gray-300 w-full h-[200px] dark:bg-gray-800 flex items-center justify-center">
                     <button className="leading-snug text-black dark:text-gray-500 font-medium">

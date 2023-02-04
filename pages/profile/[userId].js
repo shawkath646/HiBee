@@ -12,11 +12,11 @@ export default function PublicProfile() {
         <div className="max-w-7xl mx-auto">
             <div className="relative">
                 <div className="h-48 w-full bg-gray-300 dark:bg-gray-700 relative">
-                    {user?.userInfo?.coverPhoto && <Image src={user?.userInfo?.coverPhoto} fill />}
+                    {user?.userInfo?.coverPhoto && <Image src={user?.userInfo?.coverPhoto} alt="" fill />}
                 </div>
 
                 <div className="border-4 border-blue-500 rounded-full h-44 w-44 absolute left-10 -bottom-20">
-                    <Image src={profilePicGenerator(user?.userInfo?.profilePic, user?.userInfo?.gender)} fill />
+                    <Image src={profilePicGenerator(user?.userInfo?.profilePic, user?.userInfo?.gender)} alt="" fill />
                 </div>
             </div>
         </div>

@@ -19,7 +19,7 @@ export default function LeftSidebar() {
     }
 
     return (
-        <nav className="flex fixed items-center space-y-6 left-0 top-1/4 flex-col px-2">
+        <nav className="flex fixed items-center space-y-6 left-0 top-1/4 flex-col px-2 z-[9990]">
             {navTabs.map((e, k) => <LeftTabs e={e} key={k} />)}
         </nav>
     );

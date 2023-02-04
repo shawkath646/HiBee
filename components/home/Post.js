@@ -4,7 +4,7 @@ import { AiFillEye, AiFillHeart } from "react-icons/ai";
 import { BsBook, BsArrowRight } from "react-icons/bs";
 import noThumbnail from "../../public/assets/no-thumbnail.png";
 
-export default function PostTemplate({ data, user }) {
+export default function Post({ data, user }) {
     return (
         <div className="h-[400px] rounded shadow">
             <div className="h-44 relative">

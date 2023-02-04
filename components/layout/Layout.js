@@ -5,9 +5,6 @@ import { isPathInclude } from '../../utilities/tools';
 import hideComponent from "../../server-config/hideComponent"
 import useWindowSize from '../../utilities/useWindowSize';
 
-
-
-
 export default function Layout ({ children }) {
     // useEffect(() => {
     //     const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -20,7 +17,7 @@ export default function Layout ({ children }) {
         <>
             {!isPathInclude(hideComponent.hideNavbar) && <Navbar />}
                 {(!isPathInclude(hideComponent.hideLeftSidebar) && windowSize.width >= 1080) && <LeftSidebar />}
-                <main>{children}</main>
+                <main className={`min-h-screen ${!isPathInclude(hideComponent.hideNavbar) ? "pt-[50px]" : ""}`}>{children}</main>
             {!isPathInclude(hideComponent.hideFooter) && <Footer />}
         </>
     );

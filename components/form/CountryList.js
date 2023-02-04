@@ -3,12 +3,12 @@ import { Listbox, Transition } from '@headlessui/react'
 import countries from '../../server-config/countries';
 
 
-export default function CountryList({ selected, onSelect }) {
+export default function CountryList({ selected, onSelect, errorText }) {
 
   return (
       <Listbox value={selected} onChange={onSelect}>
-        <div className="relative mt-1">
-          <Listbox.Button className="relative w-full cursor-default rounded bg-transparent border border-[1.5px] py-2.5 px-2 text-left focus:outline-none sm:text-sm">
+        <div className="relative">
+          <Listbox.Button className={`relative w-full cursor-default rounded bg-transparent border-[1.5px] py-2.5 px-2 text-left focus:outline-none sm:text-sm ${errorText === "" ? "border-black dark:border-gray-200" : "border-red-500"}`}>
             <span className="block truncate">{selected === "" ? "Select country" : selected}</span>
             <label className="absolute -top-2 bg-white left-2 text-sm px-1 dark:bg-black">Country</label>
           </Listbox.Button>
@@ -49,6 +49,7 @@ export default function CountryList({ selected, onSelect }) {
               ))}
             </Listbox.Options>
           </Transition>
+          <p className="text-sm text-red-500">{errorText}</p>
         </div>
       </Listbox>
   )

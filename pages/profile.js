@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth/next"
 import { authOptions } from "./api/auth/[...nextauth]"
 import { useState, Fragment, useEffect } from "react";
 import { useForm } from 'react-hook-form';
-import FormInput from "../components/form/FormInput";
 import { Transition, Dialog, Listbox } from "@headlessui/react";
 import profilePicGenerator from "../utilities/profilePicGenerator"
 import { AiOutlineCamera, AiOutlineCheck } from 'react-icons/ai'
@@ -63,7 +62,7 @@ export default function Profile({ stringySession }) {
                 </div>
                 <div className="absolute left-4 lg:left-10 -bottom-20">
                     <div className="border-4 border-blue-500 relative bg-white dark:bg-gray-900 rounded-full h-44 w-44 overflow-hidden">
-                        <Image src={session.user.image || profilePicGenerator(session.user.userInfo?.gender)} aly="" fill />
+                        <Image src={session.user.image || profilePicGenerator(session.user.userInfo?.gender)} alt="" fill />
                     </div>
                     <button className="absolute right-2 bottom-2 bg-gray-200/75 dark:bg-black/50 dark:hover:bg-black/75 rounded-full hover:bg-gray-300/75 transition-all">
                         <AiOutlineCamera className="h-10 w-10 p-1" />

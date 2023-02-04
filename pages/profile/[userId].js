@@ -1,12 +1,11 @@
 import Image from 'next/image';
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "../api/auth/[...nextauth]"
-import { useSession } from "next-auth/react";
-import profilePicGenerator from '.../../utilities/profilePicGenerator';
+import profilePicGenerator from '../../utilities/profilePicGenerator';
 
 export default function PublicProfile() {
 
-    const { data: session } = useSession();
+    const user = {};
 
     return (
         <div className="max-w-7xl mx-auto">

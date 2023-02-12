@@ -16,8 +16,13 @@ const isPathInclude = (e) => {
     return e.some(substring=>currentPath.includes(substring.toLowerCase()));
 }
 
+const emailToUsername = (e) => {
+    return e.split("@")[0].replace(/[^a-zA-Z0-9]/g, "");
+}
+
 export {
     lockScroll,
     unlockScroll,
-    isPathInclude
+    isPathInclude,
+    emailToUsername
 };

@@ -15,6 +15,7 @@ import { FaBars } from "react-icons/fa";
 import { HiOutlineUserCircle } from "react-icons/hi";
 import { ImExit } from "react-icons/im";
 import { TfiHeadphoneAlt } from "react-icons/tfi";
+import navLogo from "../../public/assets/logo_HiBee.png"
 
 
 export default function Navbar() {
@@ -39,8 +40,9 @@ export default function Navbar() {
 		<>
 			<nav className="w-full fixed top-0 left-0 z-[9990]">
 				<div className="bg-white dark:bg-gray-800 flex items-center justify-between p-2 lg:px-10 shadow-xl">
-					<Link href="/">
-						<p className="text-2xl font-bold text-blue-500 cursor-pointer">HiBee</p>
+					<Link href="/" className="flex items-center space-x-2">
+						<Image src={navLogo.src} height="30" width="30" />
+						<p className="text-2xl font-semibold text-gray-800 dark:text-gray-200 cursor-pointer">HiBee</p>
 					</Link>
 					<div className="flex items-center space-x-3 lg:space-x-4">
 						{windowSize.width >= 768 && <Menu as="div" className="relative">
@@ -140,7 +142,7 @@ export default function Navbar() {
 						</Menu>
 					</div>
 				</div>
-				{windowSize.width < 1080 && <SubNavbar />}
+				{windowSize.width < 1280 && <SubNavbar />}
 			</nav>
 			<Transition
                 show={searchPopUp && windowSize.width < 768}

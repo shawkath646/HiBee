@@ -3,14 +3,13 @@ import { Listbox, Transition } from '@headlessui/react'
 import countries from '../../server-config/countries';
 
 
-export default function CountryList({ selected, onSelect, errorText }) {
+export default function CountryList({ value, onChange, errorText, className }) {
 
   return (
-      <Listbox value={selected} onChange={onSelect}>
-        <div className="relative">
-          <Listbox.Button className={`relative w-full cursor-default rounded bg-transparent border-[1.5px] py-2.5 px-2 text-left focus:outline-none sm:text-sm ${errorText === "" ? "border-black dark:border-gray-200" : "border-red-500"}`}>
-            <span className="block truncate">{selected === "" ? "Select country" : selected}</span>
-            <label className="absolute -top-2 bg-white left-2 text-sm px-1 dark:bg-black">Country</label>
+      <Listbox value={value} onChange={onChange}>
+        <div className="relative cursor-pointer">
+          <Listbox.Button className={`w-full rounded bg-transparent text-left outline-transparent sm:text-sm ${className}`}>
+            <span className="block truncate">{value ? value : "Select country"}</span>
           </Listbox.Button>
           <Transition
             as={Fragment}
@@ -22,34 +21,14 @@ export default function CountryList({ selected, onSelect, errorText }) {
               {Object.values(countries).sort().map((country, countryId) => (
                 <Listbox.Option
                   key={countryId}
-                  className={({ active }) =>
-                    `relative cursor-default select-none py-2 pl-10 pr-4 text-black dark:text-gray-200 ${
-                      active ? 'bg-blue-500' : ''
-                    }`
-                  }
+                  className={({ active }) => `relative select-none py-2 pl-10 pr-4 ${active ? 'bg-blue-500 text-white dark:text-gray-200' : 'text-black dark:text-gray-200'}`}
                   value={country}
                 >
-                  {({ selected }) => (
-                    <>
-                      <span
-                        className={`block truncate ${
-                          selected ? 'font-medium' : 'font-normal'
-                        }`}
-                      >
-                        {country}
-                      </span>
-                      {selected ? (
-                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600">
-                          
-                        </span>
-                      ) : null}
-                    </>
-                  )}
+                  <span className="block truncate">{country}</span>
                 </Listbox.Option>
               ))}
             </Listbox.Options>
           </Transition>
-          <p className="text-sm text-red-500">{errorText}</p>
         </div>
       </Listbox>
   )

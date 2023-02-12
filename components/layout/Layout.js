@@ -16,7 +16,7 @@ export default function Layout ({ children }) {
     return (
         <>
             {!isPathInclude(hideComponent.hideNavbar) && <Navbar />}
-                {(!isPathInclude(hideComponent.hideLeftSidebar) && windowSize.width >= 1080) && <LeftSidebar />}
+                {(!isPathInclude(hideComponent.hideLeftSidebar) && windowSize.width >= 1280) && <LeftSidebar />}
                 <main className={`min-h-screen ${!isPathInclude(hideComponent.hideNavbar) ? "pt-[50px]" : ""}`}>{children}</main>
             {!isPathInclude(hideComponent.hideFooter) && <Footer />}
         </>

@@ -30,7 +30,7 @@ export default function Home({ stringySession }) {
         <DynamicNewModal isOpen={newPostWindow} setIsOpen={setNewPostWindow} />
       </Suspense>
       {!session && <IntroductionComponent />}
-      <div className="grid grid-cols-9 lg:gap-2 pt-12">
+      <div className="grid grid-cols-9 bg-white dark:bg-gray-900">
         <Posts />
 
         {windowSize.width >= 1024 && <section className="col-span-2 pr-3">

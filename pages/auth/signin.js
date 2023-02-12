@@ -68,7 +68,7 @@ export default function SignIn({ csrfToken }) {
               <Link href="/auth/signup" className="text-blue-500 transition-all hover:text-blue-700">Create an account</Link>
             </div>
             <button type="submit" disabled={loading} className="w-full border-none hover:bg-blue-700 py-1.5 text-sm rounded text-white border transition-all bg-blue-500 flex items-center justify-center">
-              {loading && <CgSpinner className="animate-spin h-5 w-5 mr-3"></CgSpinner>}
+              {loading && <CgSpinner className="animate-spin h-5 w-5 mr-3" />}
               {loading ? "Processing..." : "LOGIN"}
             </button>
           </form>

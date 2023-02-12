@@ -5,6 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { getDocs, collection, query, where } from "firebase/firestore";
 import { db } from '../../../firebase';
 import { compare } from "bcrypt";
+import { emailToUsername } from "../../../utilities/tools";
 
 export const authOptions = {
   providers: [
@@ -24,12 +25,11 @@ export const authOptions = {
         const data = userRef.docs[0].data();
         const passwordCorrect = await compare(credentials.password, data.secureInfo.password);
         if (!passwordCorrect) throw new Error("Email or password is incorrect !");
-        const user = {
+        return {
           name: data.name,
           email: data.email,
           image: data.image
-        }
-        return user;
+        };
       }
     })
   ],
@@ -42,15 +42,13 @@ export const authOptions = {
   },
   callbacks: {
     async session({ session, user, token }) {
-      const name = session.user.name;
-      const userRef = await getDocs(query(collection(db, 'users'), where('name', '==', name)));
-      session.user.name = session.user.email.replace(/@.*$/,"");
-      session.user.token = token.sub;
+      session.user.name = emailToUsername(session.user.email);
+      const userRef = await getDocs(query(collection(db, 'users'), where('name', '==', session.user.name)));
       if (!userRef.empty) {
-        const data = userRef.docs[0].data();
-        session.user = data;
+        session.user = userRef.docs[0].data();
         session.user.secureInfo = null;
       };
+      session.user.token = token.sub;
       return session;
     },
   }

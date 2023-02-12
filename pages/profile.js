@@ -3,20 +3,40 @@ import { getServerSession } from "next-auth/next"
 import { authOptions } from "./api/auth/[...nextauth]"
 import { useState, Fragment, useEffect } from "react";
 import { useForm } from 'react-hook-form';
-import { Transition, Dialog, Listbox } from "@headlessui/react";
+import { Transition, Dialog } from "@headlessui/react";
 import profilePicGenerator from "../utilities/profilePicGenerator"
-import { AiOutlineCamera, AiOutlineCheck } from 'react-icons/ai'
+import { AiOutlineCamera } from 'react-icons/ai'
 import { BsFillPencilFill } from 'react-icons/bs'
-import { RiArrowDropDownLine} from 'react-icons/ri'
+import { CgSpinner } from "react-icons/cg";
+import GenderSelect from "../components/form/GenderSelect";
+import CountryList from "../components/form/CountryList";
+import { emailToUsername } from "../utilities/tools";
 
 
 export default function Profile({ stringySession }) {
     const session = JSON.parse(stringySession);
 
+    const [dialog, setDialog] = useState(0);
+    const [loading, setLoading] = useState(0);
+    const [statusMsg, setStatusMsg] = useState({
+        1: {
+            status: 200,
+            message: ""
+        },
+        2: {
+            status: 200,
+            message: ""
+        },
+        3: {
+            status: 200,
+            message: ""
+        },
+    })
+
     var date = new Date();
     var formattedDate = date.toISOString().slice(0,10);
 
-    const { register, handleSubmit, formState: { errors } } = useForm({
+    const { register: register1, handleSubmit: handleSubmit1, formState: { errors: errors1 } } = useForm({
         defaultValues: {
             firstName: session.user.userInfo?.firstName,
             lastName: session.user.userInfo?.lastName,
@@ -25,33 +45,75 @@ export default function Profile({ stringySession }) {
             dateOfBirth: session.user.userInfo?.dateOfBirth || formattedDate,
         }
     });
-    const onSubmit = async(data) => {
-        
+    const { register: register2, handleSubmit: handleSubmit2, formState: { errors: errors2 } } = useForm({
+        defaultValues: {
+            
+        }
+    });
+
+    const { register: register3, handleSubmit: handleSubmit3, formState: { errors: errors3 } } = useForm();
+
+    const [data, setData] = useState({
+        country: session.user.userInfo?.country || "",
+        profilePic: session.user.image,
+        coverPhoto: session.user.userInfo?.coverPhoto,
+        skills: session.user.userInfo?.skills || [],
+        gender: session.user.userInfo?.gender || "--- Select ---",
+    });
+
+    const validatePhoneNumber = (value) => {
+        let error;
+        if (!value) {
+          error = 'Phone number is required';
+        } else if (!/^\d{11}$/.test(value)) {
+          error = 'Invalid phone number, must be 10 digits';
+        }
+        return error || true;
+    };
+
+    const onSubmit1 = async(formData) => {
+        setLoading(1);
+        try {
+            await fetch("/api/profile/edit", {
+                method: "POST",
+                body: JSON.stringify({
+                    name: emailToUsername(formData.email),
+                    email: formData.email,
+                    userInfo: {
+                        firstName: formData.firstName,
+                        lastName: formData.lastName,
+                        dateOfBirth: formData.dateOfBirth,
+                        phoneNumber: formData.phoneNumber,
+                        country: data.country,
+                        gender: data.gender,
+                    },
+                }),
+            })
+            .then(res => res.json())
+            .then(e => {
+                setStatusMsg({...statusMsg, 1: { status: e.statusCode, message: e.message }});
+            });
+        } catch (error) {
+            console.log(error);
+        }
+        setLoading(0)
+    };
+    const onSubmit2 = async(data) => {
+        setLoading(2);
+        console.log(data)
+    };
+    const onSubmit3 = async(data) => {
+        setLoading(3);
         console.log(data)
     };
 
-    const [data, setData] = useState({
-        country: session.user.userInfo?.country,
-        profilePic: session.user.image,
-        coverPhoto: session.user.userInfo?.coverPhoto,
-        skills: session.user.userInfo?.skills,
-        gender: session.user.userInfo?.gender,
-    });
-
-    const [ dialog, setDialog ] = useState(0);
-
     useEffect(() => {
         if (!session.user.metaInfo?.wizardComplete) setDialog(1);
-    }, [session]);
+    }, []);
 
-    const genders = [
-        { name: 'Male' },
-        { name: 'Female' },
-        { name: 'Others' },
-    ]
 
     return (
-        <div className="min-h-screen max-w-7xl mx-auto pt-[50px] lg:pt-[10px]">
+        <div className="min-h-screen max-w-7xl mx-auto pt-[50px] xl:pt-[10px] px-3 xl:px-0">
             <div className="relative mb-10">
                 <div className="h-48 w-full bg-gray-300 dark:bg-gray-700 relative">
                     {session.user.userInfo?.coverPhoto && <Image src={session.user.userInfo?.coverPhoto} alt="" fill />}
@@ -70,114 +132,86 @@ export default function Profile({ stringySession }) {
                     <p className="text-xl text-gray-800 text-center dark:text-gray-400">@{session.user.name}</p>
                 </div>
             </div>
-            <div>
-                <p className="text-xl text-black dark:text-gray-200 text-center font-semibold">Edit profile</p>
-            </div>
-            <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-2 gap-2 p-2 lg:p-0 mt-10">
-                <section className="space-y-5 max-w-md">
-                    <div className="space-y-1">
-                        <label className="text-black dark:text-gray-200">First Name :</label>
-                        <input type="text" {...register("firstName", {required: {value: true, message: "Enter first name"}, minLength: {value: 3, message: "Minimum 3 character required"}, maxLength: { value: 32, message: "Maximum 32 character allowed"}})} className={`bg-transparent pb-2 border-b outline-0 w-full text-gray-600 dark:text-gray-200 ${errors.firstName ? "border-red-500" : "border-gray-200 dark:border-gray-800 focus:border-green-500"} transition-all`} />
-                        <p className="text-sm text-red-500">{errors.firstName?.message}</p>
-                    </div>
-                    <div className="space-y-1">
-                        <label className="text-black dark:text-gray-200">Last Name :</label>
-                        <input type="text" {...register("lastName", {required: {value: true, message: "Enter last name"}, minLength: {value: 3, message: "Minimum 3 character required"}, maxLength: { value: 32, message: "Maximum 32 character allowed"}})} className={`bg-transparent pb-2 border-b outline-0 w-full text-gray-600 dark:text-gray-200 ${errors.lastName ? "border-red-500" : "border-gray-200 dark:border-gray-800 focus:border-green-500"} transition-all autofill:bg-transparent`} />
-                        <p className="text-sm text-red-500">{errors.lastName?.message}</p>
-                    </div>
-                    <div className="space-y-2">
-                        <label className="text-black dark:text-gray-200">Date of Birth :</label>
-                        <input type="date" {...register("dateOfBirth", {required: true})} className={`bg-transparent pb-2 border-b outline-0 w-full text-gray-600 dark:text-gray-200 ${errors.lastName ? "border-red-500" : "border-gray-200 dark:border-gray-800 focus:border-green-500"} transition-all autofill:bg-transparent`} />
-                        <p className="text-sm text-red-500">{errors.dateOfBirth?.message}</p>
-                    </div>
-                    
-                </section>
-                <section className="space-y-5 max-w-md">
-                    <div className="space-y-1">
-                        <label className="text-black dark:text-gray-200">Email :</label>
-                        <input type="text" {...register("email", {required: {value: true, message: "Enter email"}, pattern: { value: /^\S+@\S+$/i, message: "Invalid email format"}})} className={`bg-transparent pb-2 border-b outline-0 w-full text-gray-600 dark:text-gray-200 ${errors.email ? "border-red-500" : "border-gray-200 dark:border-gray-800 focus:border-green-500"} transition-all autofill:bg-transparent`} readOnly />
-                        <p className="text-sm text-red-500">{errors.email?.message}</p>
-                        <p className="text-sm text-blue-500">* Email can&apos;t be change</p>
-                    </div>
-                    <div className="space-y-1">
-                        <label className="text-black dark:text-gray-200">Phone Number :</label>
-                        <input type="tel" {...register("phoneNumber", {required: true, max: 0, min: 3, maxLength: 12})} className={`bg-transparent pb-2 border-b outline-0 w-full text-gray-600 dark:text-gray-200 ${errors.email ? "border-red-500" : "border-gray-200 dark:border-gray-800 focus:border-green-500"} transition-all autofill:bg-transparent`} />
-                        <p className="text-sm text-red-500">{errors.phoneNumber?.message}</p>
-                    </div>
-                    
-                    <div className="space-y-1">
-                        <label className="text-black dark:text-gray-200 text-base">Select Gender :</label>
-                        <Listbox value={data.gender} onChange={e => setData({...data, gender: e.name})}>
-                            <div className="relative mt-1">
-                                <Listbox.Button className="relative w-full cursor-pointer text-black dark:text-gray-200 py-2 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-blue-300 sm:text-sm">
-                                    <span className="block truncate">{data.gender}</span>
-                                    <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                                        <RiArrowDropDownLine className="h-7 w-7 text-gray-400" aria-hidden="true" />
-                                    </span>
-                                </Listbox.Button>
-                                <Transition
-                                    as={Fragment}
-                                    leave="transition ease-in duration-100"
-                                    leaveFrom="opacity-100"
-                                    leaveTo="opacity-0"
-                                >
-                                    <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-gray-800 text-black dark:text-gray-200 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                    {genders.map((e, k) => (
-                                        <Listbox.Option
-                                            key={k}
-                                            className={({ active }) =>
-                                                `relative cursor-pointer select-none py-2 pl-10 pr-4 ${
-                                                active ? 'bg-blue-500/30 text-blue-900 dark:text-blue-300' : 'text-gray-900 dark:text-gray-200'
-                                                }`
-                                            }
-                                            value={e}
-                                        >
-                                            {({ selected }) => (
-                                                <>
-                                                    <span
-                                                        className={`block truncate ${
-                                                        selected ? 'font-medium' : 'font-normal'
-                                                        }`}
-                                                    >
-                                                        {e.name}
-                                                    </span>
-                                                    {selected && (
-                                                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600">
-                                                            <AiOutlineCheck className="h-5 w-5" />
-                                                        </span>
-                                                    )}
-                                                </>
-                                            )}
-                                        </Listbox.Option>
-                                    ))}
-                                    </Listbox.Options>
-                                </Transition>
-                            </div>
-                        </Listbox>
-                    </div>
-                </section>
+            <p className="mt-28 lg:mt-0 text-2xl lg:text-3xl text-black dark:text-gray-200 text-center font-medium">Personal information</p>
+            <form onSubmit={handleSubmit1(onSubmit1)} className="grid grid-cols-1 lg:grid-cols-2 gap-5 p-2 lg:p-0 mt-10 mx-auto">
+                <div className="space-y-1">
+                    <label className="text-black dark:text-gray-200 font-medium">First Name :</label>
+                    <input type="text" {...register1("firstName", {required: {value: true, message: "Enter first name"}, minLength: {value: 3, message: "Minimum 3 character required"}, maxLength: { value: 32, message: "Maximum 32 character allowed"}})} className={`bg-transparent pb-2 border-b outline-0 w-full md:w-96 block text-gray-600 dark:text-gray-200 ${errors1.firstName ? "border-red-500" : "border-gray-200 dark:border-gray-800 focus:border-green-500"} transition-all`} />
+                    <p className="text-sm text-red-500">{errors1.firstName?.message}</p>
+                </div>
+                <div className="space-y-1">
+                    <label className="text-black dark:text-gray-200 font-medium">Last Name :</label>
+                    <input type="text" {...register1("lastName", {required: {value: true, message: "Enter last name"}, minLength: {value: 3, message: "Minimum 3 character required"}, maxLength: { value: 32, message: "Maximum 32 character allowed"}})} className={`bg-transparent pb-2 border-b outline-0 w-full md:w-96 block text-gray-600  dark:text-gray-200 ${errors1.lastName ? "border-red-500" : "border-gray-200 dark:border-gray-800 focus:border-green-500"} transition-all autofill:bg-transparent`} />
+                    <p className="text-sm text-red-500">{errors1.lastName?.message}</p>
+                </div>
+                <div className="space-y-1">
+                    <label className="text-black dark:text-gray-200 font-medium">Email :</label>
+                    <input type="text" {...register1("email", {required: {value: true, message: "Enter email"}, pattern: { value: /^\S+@\S+$/i, message: "Invalid email format"}})} className={`bg-transparent pb-2 border-b outline-0 w-full md:w-96 block text-gray-600  dark:text-gray-200 ${errors1.email ? "border-red-500" : "border-gray-200 dark:border-gray-800 focus:border-green-500"} transition-all autofill:bg-transparent`} readOnly />
+                    <p className="text-sm text-red-500">{errors1.email?.message}</p>
+                    <p className="text-sm text-blue-500">* Email can&apos;t be change</p>
+                </div>
+                <div className="space-y-1">
+                    <label className="text-black dark:text-gray-200 font-medium">Phone Number :</label>
+                    <input type="tel" {...register1("phoneNumber", { validate: validatePhoneNumber } )} className={`bg-transparent pb-2 border-b outline-0 w-full md:w-96 block text-gray-600  dark:text-gray-200 ${errors1.phoneNumber ? "border-red-500" : "border-gray-200 dark:border-gray-800 focus:border-green-500"} transition-all autofill:bg-transparent`} />
+                    <p className="text-sm text-red-500">{errors1.phoneNumber?.message}</p>
+                </div>
+                <div className="space-y-2">
+                    <label className="text-black dark:text-gray-200 font-medium">Date of Birth :</label>
+                    <input type="date" {...register1("dateOfBirth", {required: true})} className={`bg-transparent pb-2 border-b outline-0 w-full md:w-96 block text-gray-600  dark:text-gray-200 ${errors1.lastName ? "border-red-500" : "border-gray-200 dark:border-gray-800 focus:border-green-500"} transition-all autofill:bg-transparent`} />
+                    <p className="text-sm text-red-500">{errors1.dateOfBirth?.message}</p>
+                </div>
+                <div className="space-y-2">
+                    <label className="text-black dark:text-gray-200 font-medium">Country :</label>
+                    <CountryList value={data.country} onChange={e => setData({ ...data, country: e })} className="pb-2 border-b outline-0 w-96 text-gray-600 dark:text-gray-200" />
+                    <p className="text-sm text-red-500">{errors1.dateOfBirth?.message}</p>
+                </div>
+                <div className="space-y-2">
+                    <label className="text-black dark:text-gray-200 font-medium">Select Gender :</label>
+                    <GenderSelect value={data.gender} onChange={e => setData({ ...data, gender: e })} className="pb-2 border-b outline-0 w-96 text-gray-600 dark:text-gray-200" />
+                    <p className="text-sm text-red-500">{errors1.dateOfBirth?.message}</p>
+                </div>
                 <div className="col-span-1 lg:col-span-2 mt-8">
-                    <button type="submit" className="mx-auto shadow-lg rounded py-1 px-8 bg-blue-500 text-white transition-all font-medium hover:bg-blue-600 flex justify-center items-center">Update</button>
+                    <p className={`text-sm mb-2 text-center ${statusMsg[1].status > 400 ? "text-red-500" : "text-green-500"}`}>{statusMsg[1].message}</p>
+                    <button type="submit" disabled={loading} className="mx-auto rounded py-1 px-8 bg-blue-500/25 text-blue-700 transition-all font-medium hover:bg-blue-500/60 disabled:bg-blue-500/10 dark:text-gray-200 flex justify-center items-center">
+                        {loading == 1 && <CgSpinner className="animate-spin h-5 w-5 mr-3" />}
+                        <p>{loading == 1 ? "Updating..." : "Update personal info"}</p>
+                    </button>
                 </div>
             </form>
-            <form className="max-w-md mt-14 p-2 lg:p-0">
-                <p className="font-semibold text-xl text--black mb-5">Change Password</p>
-                <div className="space-y-1">
-                    <label className="text-black dark:text-gray-200">Old Password</label>
-                    <input type="password" {...register("oldPassword", {minLength: {value: 8, message: "Minimum 8 character required"}, maxLength: { value: 32, message: "Maximum 32 character allowed"}, pattern: {value: "(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}", message: "Password must contain 1 capital word"}})} className={`bg-transparent pb-2 border-b outline-0 w-full text-gray-600 dark:text-gray-200 ${errors.oldPassword ? "border-red-500" : "border-gray-200 dark:border-gray-800 focus:border-green-500"} transition-all autofill:bg-transparent`} />
-                    <p className="text-sm text-red-500">{errors.oldPassword?.message}</p>
-                </div>
-                <div className="space-y-1">
-                    <label className="text-black dark:text-gray-200">New Password</label>
-                    <input type="password" {...register("newPassword", {minLength: {value: 8, message: "Minimum 8 character required"}, maxLength: { value: 32, message: "Maximum 32 character allowed"}, pattern: {value: "(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}", message: "Password must contain 1 capital word"}})} className={`bg-transparent pb-2 border-b outline-0 w-full text-gray-600 dark:text-gray-200 ${errors.newPassword ? "border-red-500" : "border-gray-200 dark:border-gray-800 focus:border-green-500"} transition-all autofill:bg-transparent`} />
-                    <p className="text-sm text-red-500">{errors.newPassword?.message}</p>
-                </div>
-                <div className="space-y-1">
-                    <label className="text-black dark:text-gray-200">Confirm New Password</label>
-                    <input type="password" {...register("confirmNewPassword", {min: 7, maxLength: 32, pattern: {value: "(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}", message: "Password must contain 1 capital word"}})} className={`bg-transparent pb-2 border-b outline-0 w-full text-gray-600 dark:text-gray-200 ${errors.confirmNewPassword ? "border-red-500" : "border-gray-200 dark:border-gray-800 focus:border-green-500"} transition-all autofill:bg-transparent`} />
-                    <p className="text-sm text-red-500">{errors.confirmNewPassword?.message}</p>
-                </div>
-            </form>
+            <div className="grid grid-cols-1 lg:grid-cols-2">
+                <form onSubmit={onSubmit2}>
+                    <div className="col-span-1 lg:col-span-2 mt-8">
+                        <button type="submit" disabled={loading} className="mx-auto rounded py-1 px-8 bg-blue-500/25 text-blue-700 transition-all font-medium hover:bg-blue-500/60 disabled:bg-blue-500/10 dark:text-gray-200 flex justify-center items-center">
+                            {loading == 2 && <CgSpinner className="animate-spin h-5 w-5 mr-3" />}
+                            <p>{loading == 2 ? "Updating..." : "Update additional info"}</p>
+                        </button>
+                    </div>
+                </form>
+                <form onSubmit={handleSubmit3(onSubmit3)} className="max-w-md mt-14 p-2 lg:p-0">
+                    <p className="text-xl lg:text-2xl text-black dark:text-gray-200 mb-5">Change Password</p>
+                    <div className="space-y-1">
+                        <label className="text-black dark:text-gray-200 font-medium">Old Password</label>
+                        <input type="password" {...register3("oldPassword", {minLength: {value: 8, message: "Minimum 8 character required"}, maxLength: { value: 32, message: "Maximum 32 character allowed"}, pattern: {value: "(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}", message: "Password must contain 1 capital word"}})} className={`bg-transparent pb-2 border-b outline-0 w-full md:w-96 block text-gray-600  dark:text-gray-200 ${errors3.oldPassword ? "border-red-500" : "border-gray-200 dark:border-gray-800 focus:border-green-500"} transition-all autofill:bg-transparent`} />
+                        <p className="text-sm text-red-500">{errors3.oldPassword?.message}</p>
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-black dark:text-gray-200 font-medium">New Password</label>
+                        <input type="password" {...register3("newPassword", {minLength: {value: 8, message: "Minimum 8 character required"}, maxLength: { value: 32, message: "Maximum 32 character allowed"}, pattern: {value: "(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}", message: "Password must contain 1 capital word"}})} className={`bg-transparent pb-2 border-b outline-0 w-full md:w-96 block text-gray-600  dark:text-gray-200 ${errors3.newPassword ? "border-red-500" : "border-gray-200 dark:border-gray-800 focus:border-green-500"} transition-all autofill:bg-transparent`} />
+                        <p className="text-sm text-red-500">{errors3.newPassword?.message}</p>
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-black dark:text-gray-200 font-medium">Confirm New Password</label>
+                        <input type="password" {...register3("confirmNewPassword", {minLength: {value: 7, message: "Minimum 8 character required"}, maxLength: { value: 32, message: "Maximum 32 character allowed"}, pattern: {value: "(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}", message: "Password must contain 1 capital word"}})} className={`bg-transparent pb-2 border-b outline-0 w-full md:w-96 block text-gray-600  dark:text-gray-200 ${errors3.confirmNewPassword ? "border-red-500" : "border-gray-200 dark:border-gray-800 focus:border-green-500"} transition-all autofill:bg-transparent`} />
+                        <p className="text-sm text-red-500">{errors3.confirmNewPassword?.message}</p>
+                    </div>
+                    <div className="col-span-1 lg:col-span-2 mt-8">
+                        <button type="submit" disabled={loading} className="mx-auto rounded py-1 px-8 bg-blue-500/25 text-blue-700 transition-all font-medium hover:bg-blue-500/60 disabled:bg-blue-500/10 dark:text-gray-200 flex justify-center items-center">
+                            {loading == 3 && <CgSpinner className="animate-spin h-5 w-5 mr-3" />}
+                            <p>{loading == 3 ? "Updating..." : "Update password"}</p>
+                        </button>
+                    </div>
+                </form>
+            </div>
             <Transition show={dialog == 1} as={Fragment}>
                 <Dialog as="div" onClose={() => {}}>
                     <Transition.Child

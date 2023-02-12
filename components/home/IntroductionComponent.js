@@ -8,10 +8,10 @@ export default function IntroductionComponent() {
         <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen bg-white dark:bg-gray-900 pt-[180px] pb-16 lg:pb-0 lg:pt-0">
             <section className="flex items-center justify-center">
                 <div className="text-center">
-                    <p className="text-7xl mb-5">Welcome to</p>
-                    <p className="font-bold text-8xl">H<span className="text-blue-500">i</span>Bee</p>
-                    <p className="mt-3 mb-5 text-xl">Your best social assistant</p>
-                    <Link href="/auth/signup" className="rounded py-2 px-8 bg-blue-500 text-white transition-all font-medium hover:bg-blue-600">Join with us !</Link>
+                    <p className="text-6xl lg:text-7xl mb-5">Welcome to</p>
+                    <p className="font-bold text-7xl lg:text-8xl">H<span className="text-blue-500">i</span>Bee</p>
+                    <p className="mt-3 mb-5 lg:text-xl">Your best social assistant</p>
+                    <Link href="/auth/signup" className="rounded py-1.5 sm:text-sm px-6 lg:py-2 lg:px-8 bg-blue-500 text-white transition-all font-medium hover:bg-blue-600">Join with us !</Link>
                     <div className="mt-3 flex space-x-3 items-center">
                         <p>Already have an account ?</p>
                         <button onClick={() => signIn()} className="rounded-sm py-1 px-2 text-blue-500">Signin</button>

@@ -4,16 +4,15 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { getSession, signIn } from "next-auth/react";
 import { useTheme } from "next-themes";
-import { RadioGroup } from '@headlessui/react'
-import { AiOutlineCheck } from 'react-icons/ai';
+import { useForm } from 'react-hook-form';
 import ToggleButton from "../../components/ui/ToggleButton";
 import CustomProviderButton from "../../components/signin/CustomProviderButton";
 import useWindowSize from "../../utilities/useWindowSize";
 import authImage from "../../public/assets/Mobilelogin.png";
-import FormInput from "../../components/form/FormInput";
 import CountryList from "../../components/form/CountryList";
 import Checkbox from "../../components/form/Checkbox";
 import { CgSpinner } from 'react-icons/cg';
+import GenderSelect from "../../components/form/GenderSelect";
 
 
 
@@ -22,10 +21,6 @@ export default function SignUp() {
     const windowSize = useWindowSize();
 
     const intialErrorState = {
-        firstName: "",
-        lastName: "",
-        email: "",
-        phoneNumber: "",
         country: "",
         dateOfBrith: "",
         password: "",
@@ -33,19 +28,12 @@ export default function SignUp() {
         backend: {}
     };
 
-    var date = new Date();
-    var formattedDate = date.toISOString().slice(0,10);
+
+    const { register, handleSubmit, formState: { errors } } = useForm();
 
     const [data, setData] = useState({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phoneNumber: "",
-        country: "",
-        dateOfBrith: formattedDate,
-        password: "",
-        confirmPassword: "",
-        gender: "",
+        country: "---Select---",
+        gender: "---Select---",
     });
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -53,82 +41,45 @@ export default function SignUp() {
 
 
     const router = useRouter();
-
-    const calculateAge = (dob) => {
-        var diff_ms = Date.now() - dob.getTime();
-        var age_dt = new Date(diff_ms);
-      
-        return Math.abs(age_dt.getUTCFullYear() - 1970);
-    }
     
-    const getAge = (dobString) => {
-        var dobArray = dobString.split("-");
-        var dob = new Date(dobArray[0], dobArray[1] - 1, dobArray[2]);
-        return calculateAge(dob);
+    const getAge = (e) => {
+        var dob = new Date(e);  
+        var month_diff = Date.now() - dob.getTime();  
+        var age_dt = new Date(month_diff);   
+        var year = age_dt.getUTCFullYear();  
+        return Math.abs(year - 1970);  
     }
 
-    const handleSubmit = async(e) => {
-        e.preventDefault();
+    const onSubmit = async(e) => {
         setLoading(true);
-        try {
-            setData({ ...data, userName: data.email.replace(/@.*$/,"") });
-        } catch (error) {
-            console.log(error);
-        };
-        try {
-            setErrorMessage(intialErrorState);
-        } catch (error) {
-            console.log(error);
-        };
-        if (!data.firstName) {
-            setErrorMessage({ ...errorMessage, firstName: "Enter first name" });
-            setLoading(false);
-            return;
-        } else if (!data.lastName) {
-            setErrorMessage({ ...errorMessage, lastName: "Enter last name" });
-            setLoading(false);
-            return;
-        } else if (!data.email) {
-            setErrorMessage({ ...errorMessage, email: "Enter email" });
-            setLoading(false);
-            return;
-        } else if (!data.email.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/)) {
-            setErrorMessage({ ...errorMessage, email: "Email is not valid" });
-            setLoading(false);
-            return;
-        } else if (!data.password) {
-            setErrorMessage({ ...errorMessage, password: "Enter password" });
-            setLoading(false);
-            return;
-        } else if (!data.password.match(/[0-9]/) || !data.password.match(/[!@#\$%\^&\*]/)) {
-            setErrorMessage({ ...errorMessage, password: "Password must include one number and special character" });
-            setLoading(false);
-            return;
-        } else if (data.password !== data.confirmPassword) {
+        console.log("e", e);
+        console.log("data", data);
+        console.log((e.dateOfBrith))
+        if (e.password !== e.confirmPassword) {
             setErrorMessage({ ...errorMessage, password: "Password doesn't match !" });
             setLoading(false);
             return;
-        } else if (!data.phoneNumber) {
-            setErrorMessage({ ...errorMessage, phoneNumber: "Enter phone number" });
-            setLoading(false);
-            return;
-        } else if (getAge(data.dateOfBrith) < 12) {
+        } else if (getAge(e.dateOfBrith) < 12) {
             setErrorMessage({ ...errorMessage, dateOfBrith: "User must be at least 12 years old" });
             setLoading(false);
             return;
-        } else if (!data.country) {
+        } else if (data.country === "---Select---") {
             setErrorMessage({ ...errorMessage, country: "Select country" });
             setLoading(false);
             return;
-        } else if (!data.gender) {
+        } else if (data.gender === "---Select---") {
             setErrorMessage({ ...errorMessage, gender: "Select gender" });
             setLoading(false);
             return;
         }
-        
-        await fetch("/api/auth/createAccountCre", {
+        setErrorMessage(intialErrorState);
+        setLoading(false);
+        return
+        await fetch(`${process.env.BASE_URL}/api/auth/createAccount`, {
             method: "POST",
-            body: JSON.stringify(data),
+            body: JSON.stringify({
+
+            }),
         })
         .then(res => res.json())
         .then(async(msgData) => {
@@ -164,45 +115,56 @@ export default function SignUp() {
                 )}
                 <div className="w-full lg:w-[700px] mx-auto col-span-2">
                     <p className="text-6xl font-bold mb-7 text-center">H<span className="text-blue-500">i</span>Bee<small className="text-lg">auth</small></p>
-                    <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                        <div className="space-y-5">
-                            <FormInput label="First Name" name="firstName" value={data.firstName} setValue={(e) => setData({...data, firstName: e})} errorText={errorMessage.firstName} />
-                            <FormInput label="Last Name" name="lastName" value={data.lastName} setValue={(e) => setData({...data, lastName: e})} errorText={errorMessage.lastName} />
-                            <FormInput label="Email" name="email" value={data.email} setValue={(e) => setData({...data, email: e})}  errorText={errorMessage.email} />
-                            <FormInput label="Password" name="password" type={showPassword ? "text" : "password"} value={data.password} setValue={(e) => setData({...data, password: e})} errorText={errorMessage.password} />
-                            <FormInput label="Confirm Password" name="confirmPassword" type={showPassword ? "text" : "password"} value={data.confirmPassword} setValue={(e) => setData({...data, confirmPassword: e})} />
-                            <Checkbox onChange={() => setShowPassword(!showPassword)} label="Show password" checked={showPassword} />
+                    <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                        <div className="relative w-full">
+                            <input type="text" {...register("firstName", {required: {value: true, message: "Enter first name"}, minLength: {value: 3, message: "Minimum 3 character required"}, maxLength: { value: 32, message: "Maximum 32 character allowed"}})} className={`outline-0 ring-0 border-[1.5px] rounded px-2 py-2.5  w-full bg-transparent ${errors.firstName ? "border-red-500" : "border-black dark:border-gray-200"}`} />
+                            <label className="absolute -top-2 bg-white left-2 text-sm px-1 dark:bg-gray-900">First Name :</label>
+                            <p className="text-sm text-red-500">{errors.firstName?.message}</p>
                         </div>
-                        <div className="space-y-5">
-                            <FormInput label="Phone Number" name="phoneNumber" type="telephone" value={data.phoneNumber} setValue={(e) => setData({...data, phoneNumber: e})} errorText={errorMessage.phoneNumber} />
-                            <FormInput label="Date of birth" type="date" value={data.dateOfBrith} setValue={(e) => setData({...data, dateOfBrith: e})} errorText={errorMessage.dateOfBrith} />
+                        <div className="relative w-full">
+                            <input type="text" {...register("lastName", {required: {value: true, message: "Enter last name"}, minLength: {value: 3, message: "Minimum 3 character required"}, maxLength: { value: 32, message: "Maximum 32 character allowed"}})} className={`outline-0 ring-0 border-[1.5px] rounded px-2 py-2.5  w-full bg-transparent ${errors.lastName ? "border-red-500" : "border-black dark:border-gray-200"}`} />
+                            <label className="absolute -top-2 bg-white left-2 text-sm px-1 dark:bg-gray-900">Last Name :</label>
+                            <p className="text-sm text-red-500">{errors.lastName?.message}</p>
+                        </div>
+                        <div className="relative w-full">
+                            <input type="email" {...register("email", {required: {value: true, message: "Enter email"}})} className={`outline-0 ring-0 border-[1.5px] rounded px-2 py-2.5  w-full bg-transparent ${errors.email ? "border-red-500" : "border-black dark:border-gray-200"}`} />
+                            <label className="absolute -top-2 bg-white left-2 text-sm px-1 dark:bg-gray-900">Email :</label>
+                            <p className="text-sm text-red-500">{errors.email?.message}</p>
+                        </div>
+                        <div className="relative w-full">
+                            <input type="date" {...register("dateOfBirth", {required: {value: true, message: "Enter date of birth"}})} className={`outline-0 ring-0 border-[1.5px] rounded px-2 py-2.5  w-full bg-transparent ${errors.dateOfBrith ? "border-red-500" : "border-black dark:border-gray-200"}`} />
+                            <label className="absolute -top-2 bg-white left-2 text-sm px-1 dark:bg-gray-900">Date of Birth :</label>
+                            <p className="text-sm text-red-500">{errors.dateOfBrith?.message || errorMessage.dateOfBrith}</p>
+                        </div>
+                        <div className="relative">
                             <CountryList
-                              selected={data.country}
-                              onSelect={(e) => setData({...data, country: e})} errorText={errorMessage.country}
+                                value={data.country}
+                                onChange={(e) => setData({...data, country: e})} errorText={errorMessage.country}
+                                className={`py-3 px-2 border-[1.5px] rounded ${errorMessage.country ? "border-red-500" : "border-black dark:border-gray-200"}`}
                             />
-                            <RadioGroup value={data.gender} onChange={(e) => setData({...data, gender: e})}>
-                                <div  className="flex space-x-2 items-center">
-                                    <RadioGroup.Label>Gender :</RadioGroup.Label>
-                                    <RadioGroup.Option value="Male">
-                                        {({ checked }) => (
-                                        <button type="button" className={`flex space-x-1 items-center ${checked ? "text-blue-500" : ""}`}>
-                                            {checked && <AiOutlineCheck className="h-4 w-4" />}
-                                            <p>Male</p>
-                                        </button>
-                                        )}
-                                    </RadioGroup.Option>
-                                    <RadioGroup.Option value="Female">
-                                        {({ checked }) => (
-                                        <button type="button" className={`flex space-x-1 items-center ${checked ? "text-blue-500" : ""}`}>
-                                            {checked && <AiOutlineCheck className="h-4 w-4" />}
-                                            <p>Female</p>
-                                        </button>
-                                        )}
-                                    </RadioGroup.Option>
-                                </div>
-                                <p className="text-sm text-red-500">{errorMessage.gender}</p>
-                            </RadioGroup>
+                            <label className="absolute -top-2 bg-white left-2 text-sm px-1 dark:bg-gray-900">Country</label>
+                            <p className="text-sm text-red-500">{errorMessage.country}</p>
                         </div>
+                        <div className="relative">
+                            <GenderSelect
+                                value={data.gender}
+                                onChange={(e) => setData({...data, gender: e})} errorText={errorMessage.gender}
+                                className={`py-3 px-2 border-[1.5px] rounded ${errorMessage.gender ? "border-red-500" : "border-black dark:border-gray-200"}`}
+                            />
+                            <label className="absolute -top-2 bg-white left-2 text-sm px-1 dark:bg-gray-900">Gender</label>
+                            <p className="text-sm text-red-500">{errorMessage.gender}</p>
+                        </div>
+                        <div className="relative w-full">
+                            <input type={showPassword ? "text" : "password"} {...register("password", {required: {value: true, message: "Enter password"}, minLength: {value: 8, message: "Minimum 8 character required"}, maxLength: { value: 32, message: "Maximum 32 character allowed"}})} className={`outline-0 ring-0 border-[1.5px] rounded px-2 py-2.5 w-full bg-transparent ${errors.password ? "border-red-500" : "border-black dark:border-gray-200"}`} />
+                            <label className="absolute -top-2 bg-white left-2 text-sm px-1 dark:bg-gray-900">Password :</label>
+                            <p className="text-sm text-red-500">{errors.password?.message || errorMessage.password}</p>
+                        </div>
+                        <div className="relative w-full">
+                            <input type={showPassword ? "text" : "password"} {...register("confirmPassword", {required: {value: true, message: "Enter confirm password"}, minLength: {value: 8, message: "Minimum 8 character required"}, maxLength: { value: 32, message: "Maximum 32 character allowed"}})} className={`outline-0 ring-0 border-[1.5px] rounded px-2 py-2.5  w-full bg-transparent ${errors.confirmPassword ? "border-red-500" : "border-black dark:border-gray-200"}`} />
+                            <label className="absolute -top-2 bg-white left-2 text-sm px-1 dark:bg-gray-900">Confirm Password :</label>
+                            <p className="text-sm text-red-500">{errors.confirmPassword?.message}</p>
+                        </div>
+                        <Checkbox onChange={() => setShowPassword(!showPassword)} label="Show password" checked={showPassword} />
                         <div className="col-span-1 lg:col-span-2">
                             <p className={`text-sm text-center mb-2 ${errorMessage.backend.status ? "text-green-500" : "text-red-500"}`}>{errorMessage.backend.message !== "" && errorMessage.backend.message}</p>
                             <button type="submit" disabled={loading} className="mx-auto rounded py-2 px-8 bg-blue-500 text-white transition-all font-medium hover:bg-blue-600 flex justify-center items-center">

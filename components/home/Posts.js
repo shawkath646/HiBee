@@ -10,7 +10,7 @@ export default function Posts() {
     const windowSize = useWindowSize();
 
     return (
-        <section className="col-span-9 lg:col-span-7 py-10 bg-white dark:bg-gray-900 h-[815px]">
+        <section className="col-span-9 lg:col-span-7 py-10 h-[815px]">
           <div className="text-center mb-10">
             <p className="text-4xl pb-1 border-b-2 border-gray-900 text-gray-900 dark:text-gray-200 dark:border-gray-200 inline-block px-5 font-light">Latest</p>
           </div>
